@@ -2,7 +2,7 @@
   "name": "logseq-pele",
   "version": "0.1.0",
   "description": "Blazing fast Mermaid diagrams in Logseq powered by Pele",
-  "author": "byp",
+  "author": "b-yp",
   "license": "MIT",
   "main": "dist/index.html",
   "logseq": {
