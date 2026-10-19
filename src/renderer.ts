@@ -69,7 +69,7 @@ export default function PeleRenderer(props: PeleRendererProps) {
       const message = err?.message || String(err)
       el.innerHTML = `
         <div class="logseq-pele-error">
-          <div class="logseq-pele-error-title">⚠️ Mermaid 语法解析错误</div>
+          <div class="logseq-pele-error-title">⚠️ Mermaid Syntax Error</div>
           <div>${message}</div>
         </div>
       `

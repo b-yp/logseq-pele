@@ -7,7 +7,7 @@ const CODE_ATTR = 'data-pele-code'
 const PREVIEW_CLASS = 'logseq-pele-preview'
 const COLLAPSED_CLASS = 'pele-code-collapsed'
 const HIDE_CHART_CLASS = 'pele-chart-hidden'
-const PELE_RENDER_VERSION = '2.5'
+const PELE_RENDER_VERSION = '2.6'
 
 function getTopContext(): { doc: Document; win: Window } {
   try {
@@ -94,9 +94,9 @@ function renderPeleBlock(blockEl: HTMLElement) {
   const detectedType = peleDetectType(code)
   const badgeLabel = formatDiagramType(detectedType)
   const toggleCodeIcon = isCollapsed ? ICONS.expand : ICONS.collapse
-  const toggleCodeLabel = isCollapsed ? '展开代码' : '收起代码'
+  const toggleCodeLabel = isCollapsed ? 'Expand Code' : 'Collapse Code'
   const toggleChartIcon = isChartHidden ? ICONS.eye : ICONS.eyeOff
-  const toggleChartLabel = isChartHidden ? '显示图表' : '隐藏图表'
+  const toggleChartLabel = isChartHidden ? 'Show Diagram' : 'Hide Diagram'
 
   try {
     const result = peleRender(code, {
@@ -105,28 +105,28 @@ function renderPeleBlock(blockEl: HTMLElement) {
     })
 
     const badgeHtml = badgeLabel
-      ? `<span class="logseq-pele-badge" title="图表类型: ${badgeLabel}">${badgeLabel}</span>`
+      ? `<span class="logseq-pele-badge" title="Diagram type: ${badgeLabel}">${badgeLabel}</span>`
       : ''
 
     previewEl.innerHTML = `
       <div class="logseq-pele-actions">
-        <button class="logseq-pele-btn logseq-pele-toggle-btn" type="button" title="点击折叠或展开源码">
+        <button class="logseq-pele-btn logseq-pele-toggle-btn" type="button" title="Click to collapse or expand source code">
           <span class="pele-btn-icon">${toggleCodeIcon}</span>
           <span class="pele-btn-label">${toggleCodeLabel}</span>
         </button>
-        <button class="logseq-pele-btn logseq-pele-toggle-chart-btn" type="button" title="${isChartHidden ? '点击显示渲染图表' : '点击隐藏渲染图表，只看代码'}">
+        <button class="logseq-pele-btn logseq-pele-toggle-chart-btn" type="button" title="${isChartHidden ? 'Click to show rendered diagram' : 'Click to hide diagram and view code only'}">
           <span class="pele-btn-icon">${toggleChartIcon}</span>
           <span class="pele-btn-label">${toggleChartLabel}</span>
         </button>
-        <button class="logseq-pele-btn logseq-pele-copy-btn" type="button" title="复制 SVG 矢量代码到剪贴板">
+        <button class="logseq-pele-btn logseq-pele-copy-btn" type="button" title="Copy SVG vector code to clipboard">
           <span class="pele-btn-icon">${ICONS.copy}</span>
-          <span class="pele-btn-label">复制 SVG</span>
+          <span class="pele-btn-label">Copy SVG</span>
         </button>
-        <button class="logseq-pele-btn logseq-pele-svg-btn" type="button" title="下载为 .svg 矢量文件">
+        <button class="logseq-pele-btn logseq-pele-svg-btn" type="button" title="Download as .svg vector file">
           <span class="pele-btn-icon">${ICONS.downloadSvg}</span>
           <span class="pele-btn-label">SVG</span>
         </button>
-        <button class="logseq-pele-btn logseq-pele-png-btn" type="button" title="下载为高清 .png 图片">
+        <button class="logseq-pele-btn logseq-pele-png-btn" type="button" title="Download as high-resolution .png image">
           <span class="pele-btn-icon">${ICONS.downloadPng}</span>
           <span class="pele-btn-label">PNG</span>
         </button>
@@ -147,7 +147,7 @@ function renderPeleBlock(blockEl: HTMLElement) {
         const labelEl = toggleBtn.querySelector('.pele-btn-label')
         const iconEl = toggleBtn.querySelector('.pele-btn-icon')
         if (labelEl) {
-          labelEl.textContent = nowCollapsed ? '展开代码' : '收起代码'
+          labelEl.textContent = nowCollapsed ? 'Expand Code' : 'Collapse Code'
         }
         if (iconEl) {
           iconEl.innerHTML = nowCollapsed ? ICONS.expand : ICONS.collapse
@@ -169,7 +169,7 @@ function renderPeleBlock(blockEl: HTMLElement) {
           if (toggleBtn) {
             const codeLabel = toggleBtn.querySelector('.pele-btn-label')
             const codeIcon = toggleBtn.querySelector('.pele-btn-icon')
-            if (codeLabel) codeLabel.textContent = '收起代码'
+            if (codeLabel) codeLabel.textContent = 'Collapse Code'
             if (codeIcon) codeIcon.innerHTML = ICONS.collapse
           }
         }
@@ -177,12 +177,12 @@ function renderPeleBlock(blockEl: HTMLElement) {
         const labelEl = toggleChartBtn.querySelector('.pele-btn-label')
         const iconEl = toggleChartBtn.querySelector('.pele-btn-icon')
         if (labelEl) {
-          labelEl.textContent = nowHidden ? '显示图表' : '隐藏图表'
+          labelEl.textContent = nowHidden ? 'Show Diagram' : 'Hide Diagram'
         }
         if (iconEl) {
           iconEl.innerHTML = nowHidden ? ICONS.eye : ICONS.eyeOff
         }
-        toggleChartBtn.title = nowHidden ? '点击显示渲染图表' : '点击隐藏渲染图表，只看代码'
+        toggleChartBtn.title = nowHidden ? 'Click to show rendered diagram' : 'Click to hide diagram and view code only'
       })
     }
 
@@ -214,7 +214,7 @@ function renderPeleBlock(blockEl: HTMLElement) {
     const msg = err?.message || String(err)
     previewEl.innerHTML = `
       <div class="logseq-pele-error">
-        <div class="logseq-pele-error-title">⚠️ Mermaid 语法解析错误</div>
+        <div class="logseq-pele-error-title">⚠️ Mermaid Syntax Error</div>
         <div>${msg}</div>
       </div>
     `

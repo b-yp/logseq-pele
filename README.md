@@ -1,41 +1,49 @@
 # logseq-pele
 
-> 🚀 **极速、高颜值、零外部依赖** 的 Logseq Mermaid 图表渲染插件，基于 Steph Ango (kepano) 发起的全新新一代渲染引擎 [Pele](https://github.com/obsidianmd/pele)。
+> 🚀 **Ultra-fast, theme-adaptive, zero-dependency** Mermaid diagram renderer for Logseq, powered by Steph Ango's ([@kepano](https://github.com/obsidianmd/pele)) next-generation [Pele](https://github.com/obsidianmd/pele) engine.
 
 ---
 
-## ✨ 核心特性
+## ✨ Features
 
-- ⚡ **超轻量 & 极致性能**：比传统 `mermaid.js` 提速 **100~500 倍**，冷启动与渲染几近零延迟。
-- 🎨 **原生主题自适应**：生成纯净语义化 SVG，内置 CSS 变量规范，无缝契合 Logseq 亮暗主题切换。
-- 🔍 **内置平移与滚轮缩放 (Zoom & Pan)**：大图、复杂流程图轻松漫游，支持无级滚轮缩放与鼠标拖拽平移。
-- 🔀 **无缝接管与双语法支持**：
-  - 支持直接接管标准 ````mermaid` 代码块；
-  - 也支持显式使用 ````pele` 代码块（可按需在设置中开启或关闭）。
-- 🛡️ **优雅容错机制**：遇到格式解析错误时提供友好的内联错误提示，不破坏页面其它笔记排版。
+- ⚡ **Blazing Fast**: Up to **100–500x faster** than traditional `mermaid.js`, with instant cold start and near-zero render latency.
+- 🎨 **Native Theme Adaptive**: Generates clean, semantic SVG using CSS variables that seamlessly follow your Logseq light and dark themes.
+- 🔄 **Logseq DB & Modern Support**: Specially engineered with pure DOM observation to support Logseq DB (Database) version and classic builds alike.
+- 📐 **Dual-mode Toggles**:
+  - **Collapse/Expand Code**: Hide the code editor to view a clean, distraction-free diagram.
+  - **Hide/Show Diagram**: Hide the rendered diagram when you just want to read or edit raw code.
+- 💾 **Export & Copy**:
+  - **Copy SVG**: Copy styled vector SVG directly to the clipboard with one click.
+  - **Download SVG**: Save as a standalone `.svg` vector file.
+  - **Download PNG**: Export crisp, high-resolution 2x Retina `.png` image with solid theme background.
+- 🔀 **Mermaid & Pele Syntax Support**:
+  - Automatically takes over standard ````mermaid` fenced code blocks.
+  - Also supports explicit ````pele` fenced code blocks.
+- 🛡️ **Graceful Error Handling**: Displays inline error messages if syntax is invalid, without breaking your page layout.
 
 ---
 
-## 📦 安装与加载方法
+## 📦 Installation
 
-### 本地手动安装（开发 / 测试）
-1. 在终端中构建项目：
+### Load Unpacked (Development / Manual Install)
+
+1. Build the plugin:
    ```bash
    pnpm install
    pnpm run build
    ```
-2. 打开 **Logseq**：
-   - 点击右上角设置（Settings） -> **高级设置 (Advanced)** -> 开启 **开发者模式 (Developer Mode)**。
-   - 点击顶部导航栏的插件管理图标（Plugins） -> 进入 **已安装插件 (Plugins)** 页面。
-   - 点击 **Load unpacked plugin**（加载解压的插件）。
-   - 选择本仓库的根目录（即包含 `package.json` 与 `dist/` 的文件夹）。
-3. 插件立即生效！
+2. In **Logseq**:
+   - Go to **Settings** -> **Advanced** -> Enable **Developer Mode**.
+   - Open **Plugins** from the top toolbar or menu.
+   - Click **Load unpacked plugin**.
+   - Select the repository root folder (the folder containing `package.json` and `dist/`).
+3. Done! The plugin is now active.
 
 ---
 
-## 📝 使用方法
+## 📝 Usage
 
-在 Logseq 任意块中直接输入标准 mermaid 或 pele 围栏代码块：
+Type standard mermaid or pele code blocks anywhere in your notes:
 
 ````markdown
 ```mermaid
@@ -48,7 +56,7 @@ graph TD
 ```
 ````
 
-或者显式指定 `pele`：
+Or explicitly using `pele`:
 
 ````markdown
 ```pele
@@ -58,28 +66,36 @@ sequenceDiagram
 ```
 ````
 
+Hover over the rendered diagram to reveal the quick actions bar:
+- `Collapse Code` / `Expand Code`
+- `Hide Diagram` / `Show Diagram`
+- `Copy SVG`
+- `SVG` (Download)
+- `PNG` (Download)
+- Diagram Type Badge (e.g. `Flowchart`, `Sequence`)
+
 ---
 
-## ⚙️ 插件配置项
+## ⚙️ Settings
 
-前往 Logseq **设置** -> **插件设置 (Plugin Settings)** -> **logseq-pele**：
+Open **Settings** -> **Plugin Settings** -> **logseq-pele**:
 
-| 设置项 | 说明 | 默认值 |
+| Setting | Description | Default |
 | :--- | :--- | :--- |
-| **接管 mermaid 代码块** | 是否使用 Pele 接管原生的 ````mermaid` 块 | `true` |
-| **支持 pele 代码块** | 是否注册专用的 ````pele` 代码块 | `true` |
-| **启用平移与缩放 (Zoom & Pan)** | 是否允许在图表上通过滚轮缩放、鼠标拖拽漫游 | `true` |
-| **图表基础字号** | Pele 渲染图表时的基准字体大小 (px) | `14` |
-| **自适应宽度 (Responsive)** | 是否自动适应笔记容器宽度 | `true` |
+| **Override Mermaid Code Blocks** | Use Pele engine instead of default renderer for ````mermaid` | `true` |
+| **Support Pele Code Blocks** | Enable rendering for explicit ````pele` code blocks | `true` |
+| **Base Font Size (px)** | Base font size used by Pele renderer | `14` |
+| **Responsive Width** | Automatically fit diagram to container width | `true` |
 
 ---
 
-## 🛠️ 技术致敬与鸣谢
+## 🛠️ Acknowledgements
 
 - [Pele](https://github.com/obsidianmd/pele) by Steph Ango ([@kepano](https://x.com/kepano))
-- [logseq-fenced-code-plus](https://github.com/xyhp915/logseq-fenced-code-plus) by [@xyhp915](https://github.com/xyhp915) 提供 Logseq 围栏扩展参考
+- [logseq-fenced-code-plus](https://github.com/xyhp915/logseq-fenced-code-plus) by [@xyhp915](https://github.com/xyhp915)
 
 ---
 
 ## 📄 License
+
 [MIT](./LICENSE)

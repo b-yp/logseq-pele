@@ -50,7 +50,7 @@ function main(baseInfo: LSPluginBaseInfo) {
 
   // 4. 用户右下角通知
   try {
-    logseq.UI.showMsg('🚀 Pele Mermaid 渲染器已激活！', 'success', { timeout: 3000 })
+    logseq.UI.showMsg('🚀 Pele Mermaid Renderer activated!', 'success', { timeout: 3000 })
   } catch {}
 }
 
