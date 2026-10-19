@@ -3,59 +3,57 @@ import { LSPluginBaseInfo } from '@logseq/libs/dist/LSPlugin'
 import { settingsSchema, PelePluginSettings } from './settings'
 import PeleRenderer from './renderer'
 import themeStyles from './pele-theme.css?inline'
+import { initDomObserver } from './dom-observer'
 
 const RENDERER_TYPES = {
   MERMAID: 'mermaid',
   PELE: 'pele'
 }
 
-function registerRenderers(settings: PelePluginSettings) {
-  // 接管 ```mermaid
-  if (settings.overrideMermaid !== false) {
-    try {
+function registerLegacyRenderers(settings: PelePluginSettings) {
+  try {
+    if (settings.overrideMermaid !== false) {
       logseq.Experiments.registerFencedCodeRenderer(RENDERER_TYPES.MERMAID, {
         edit: false,
         render: PeleRenderer
       })
-      console.log('[logseq-pele] Registered renderer for ```mermaid')
-    } catch (e) {
-      console.error('[logseq-pele] Failed to register mermaid renderer:', e)
     }
-  }
-
-  // 支持 ```pele
-  if (settings.supportPele !== false) {
-    try {
+    if (settings.supportPele !== false) {
       logseq.Experiments.registerFencedCodeRenderer(RENDERER_TYPES.PELE, {
         edit: false,
         render: PeleRenderer
       })
-      console.log('[logseq-pele] Registered renderer for ```pele')
-    } catch (e) {
-      console.error('[logseq-pele] Failed to register pele renderer:', e)
     }
+  } catch (e) {
+    // legacy fallback
   }
 }
 
 function main(baseInfo: LSPluginBaseInfo) {
-  console.log('[logseq-pele] Initializing plugin...', baseInfo)
+  try {
+    if (typeof window !== 'undefined' && window.top?.console) {
+      window.top.console.log('[logseq-pele] Pele Mermaid Renderer activated successfully.')
+    }
+  } catch {}
 
-  // 1. 注入主题样式至 Logseq 宿主主窗口
-  logseq.provideStyle(themeStyles)
+  // 1. 注入样式
+  try {
+    logseq.provideStyle(themeStyles)
+  } catch (err) {}
 
-  // 2. 根据设置注册代码块渲染器
-  const settings = (logseq.settings || {}) as PelePluginSettings
-  registerRenderers(settings)
+  // 2. 传统注册兜底
+  const settings = Object.assign({}, baseInfo?.settings, logseq.settings) as PelePluginSettings
+  registerLegacyRenderers(settings)
 
-  // 3. 监听设置变动
-  logseq.onSettingsChanged((newSettings: PelePluginSettings, oldSettings: PelePluginSettings) => {
-    console.log('[logseq-pele] Settings updated:', { oldSettings, newSettings })
-    // 如果启用了新的代码块类型，注册它
-    registerRenderers(newSettings)
-  })
+  // 3. 启动 DOM 观测渲染器（完美适配 Logseq DB 版本与现代版本）
+  initDomObserver()
+
+  // 4. 用户右下角通知
+  try {
+    logseq.UI.showMsg('🚀 Pele Mermaid 渲染器已激活！', 'success', { timeout: 3000 })
+  } catch {}
 }
 
-// 插件入口
 logseq
   .useSettingsSchema(settingsSchema)
   .ready(main)

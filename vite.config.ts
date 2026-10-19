@@ -1,30 +1,22 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { viteSingleFile } from 'vite-plugin-singlefile'
 
 export default defineConfig({
   plugins: [
-    react({
-      jsxRuntime: 'classic'
-    })
+    viteSingleFile(),
+    {
+      name: 'remove-crossorigin',
+      enforce: 'post',
+      transformIndexHtml(html) {
+        return html.replace(/ crossorigin(="[^"]*")?/g, '')
+      }
+    }
   ],
   base: './',
-  resolve: {
-    alias: {
-      react: path.resolve(__dirname, 'src/React.ts'),
-      'react-dom': path.resolve(__dirname, 'src/ReactDOM.ts')
-    }
-  },
   build: {
     target: 'esnext',
     outDir: 'dist',
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/[name].js',
-        chunkFileNames: 'assets/[name].js',
-        assetFileNames: 'assets/[name].[ext]'
-      }
-    }
+    cssCodeSplit: false
   }
 })
