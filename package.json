@@ -1,0 +1,30 @@
+{
+  "name": "logseq-pele",
+  "version": "0.1.0",
+  "description": "Blazing fast Mermaid diagrams in Logseq powered by Pele",
+  "author": "byp",
+  "license": "MIT",
+  "main": "dist/index.html",
+  "logseq": {
+    "id": "logseq-pele",
+    "title": "Pele (Mermaid Renderer)",
+    "description": "Blazing fast Mermaid diagram renderer powered by Pele.",
+    "icon": "icon.png",
+    "main": "dist/index.html"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@logseq/libs": "^0.0.17",
+    "pele": "^1.6.0",
+    "react": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.48",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.4"
+  }
+}

@@ -1,0 +1,125 @@
+/* Logseq Pele Theme Adapter */
+
+.logseq-pele-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logseq-pele-container {
+  /* 基础尺寸与布局 */
+  position: relative;
+  width: 100%;
+  min-height: 80px;
+  max-width: 100%;
+  overflow: auto;
+  padding: 12px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background-color: var(--pele-bg, var(--ls-secondary-background-color, transparent));
+  border: 1px solid var(--ls-border-color, rgba(128, 128, 128, 0.2));
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+
+  /* 将 Logseq CSS 变量桥接到 Pele 原生规范 */
+  --pele-font: var(--ls-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --pele-font-mono: var(--ls-font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  --pele-radius: 6px;
+
+  --pele-bg: var(--ls-secondary-background-color, #ffffff);
+  --pele-fg: var(--ls-primary-text-color, #2b3a42);
+  --pele-muted: var(--ls-secondary-text-color, #6b7280);
+  --pele-line: var(--ls-border-color, #94a3b8);
+  --pele-border: var(--ls-border-color, #cbd5e1);
+  --pele-surface: var(--ls-primary-background-color, #f8fafc);
+  --pele-surface-alt: var(--ls-tertiary-background-color, #e2e8f0);
+  --pele-accent: var(--ls-link-text-color, #3b82f6);
+  --pele-error: #ef4444;
+  --pele-critical: #dc2626;
+}
+
+/* 深色模式适配 */
+html[data-theme='dark'] .logseq-pele-container,
+.dark .logseq-pele-container {
+  --pele-bg: var(--ls-secondary-background-color, #1e1e24);
+  --pele-fg: var(--ls-primary-text-color, #e2e8f0);
+  --pele-muted: var(--ls-secondary-text-color, #94a3b8);
+  --pele-line: var(--ls-border-color, #475569);
+  --pele-border: var(--ls-border-color, #334155);
+  --pele-surface: var(--ls-primary-background-color, #0f172a);
+  --pele-surface-alt: var(--ls-tertiary-background-color, #1e293b);
+  --pele-accent: var(--ls-link-text-color, #60a5fa);
+  --pele-error: #f87171;
+  --pele-critical: #ef4444;
+}
+
+.logseq-pele-container:hover {
+  border-color: var(--ls-link-text-color, #3b82f6);
+}
+
+.logseq-pele-container svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 支持缩放漫游时的 SVG 样式 */
+.logseq-pele-container.is-zoomable {
+  cursor: grab;
+}
+
+.logseq-pele-container.is-zoomable:active {
+  cursor: grabbing;
+}
+
+/* 工具栏小浮标 */
+.logseq-pele-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 10;
+}
+
+.logseq-pele-wrapper:hover .logseq-pele-actions {
+  opacity: 1;
+}
+
+.logseq-pele-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: var(--pele-accent, #3b82f6);
+  color: #ffffff;
+  user-select: none;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.logseq-pele-error {
+  padding: 10px 14px;
+  border-radius: 6px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  font-size: 13px;
+  font-family: var(--pele-font-mono, monospace);
+  white-space: pre-wrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.logseq-pele-error-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
