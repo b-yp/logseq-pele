@@ -1,9 +1,13 @@
 import { render as peleRender, supports as peleSupports, detectType as peleDetectType } from 'pele'
 import themeStyles from './pele-theme.css?inline'
+import { copySvgToClipboard, downloadSvgFile, downloadPngFile } from './export-utils'
+import { ICONS } from './icons'
 
 const CODE_ATTR = 'data-pele-code'
 const PREVIEW_CLASS = 'logseq-pele-preview'
 const COLLAPSED_CLASS = 'pele-code-collapsed'
+const HIDE_CHART_CLASS = 'pele-chart-hidden'
+const PELE_RENDER_VERSION = '2.5'
 
 function getTopContext(): { doc: Document; win: Window } {
   try {
@@ -48,8 +52,8 @@ function isMermaidOrPele(blockEl: HTMLElement, code: string): boolean {
 }
 
 function formatDiagramType(type: string | null): string {
-  if (!type) return 'Pele'
-  return `Pele · ${type.charAt(0).toUpperCase() + type.slice(1)}`
+  if (!type) return ''
+  return type.charAt(0).toUpperCase() + type.slice(1)
 }
 
 function renderPeleBlock(blockEl: HTMLElement) {
@@ -61,15 +65,20 @@ function renderPeleBlock(blockEl: HTMLElement) {
 
   if (!isMermaidOrPele(blockEl, code)) return
 
-  // 防循环守卫：代码未改变且预览已存在时直接退出，不触碰任何 DOM
+  // 防循环守卫：不仅检查代码，还要检查渲染版本以及所有操作按钮是否齐备
   const lastCode = blockEl.getAttribute(CODE_ATTR)
+  const lastVer = blockEl.getAttribute('data-pele-ver')
   const existingPreview = blockEl.querySelector(`.${PREVIEW_CLASS}`)
-  if (lastCode === code && existingPreview) {
+  const hasExportBtns = existingPreview?.querySelector('.logseq-pele-copy-btn') !== null
+  const hasToggleChartBtn = existingPreview?.querySelector('.logseq-pele-toggle-chart-btn') !== null
+
+  if (lastCode === code && existingPreview && lastVer === PELE_RENDER_VERSION && hasExportBtns && hasToggleChartBtn) {
     return
   }
 
-  // 记录当前代码
+  // 记录当前代码与渲染版本
   blockEl.setAttribute(CODE_ATTR, code)
+  blockEl.setAttribute('data-pele-ver', PELE_RENDER_VERSION)
 
   let previewEl = existingPreview as HTMLElement | null
   if (!previewEl) {
@@ -81,8 +90,13 @@ function renderPeleBlock(blockEl: HTMLElement) {
   blockEl.setAttribute('data-pele-rendered', 'true')
 
   const isCollapsed = blockEl.classList.contains(COLLAPSED_CLASS)
+  const isChartHidden = blockEl.classList.contains(HIDE_CHART_CLASS)
   const detectedType = peleDetectType(code)
   const badgeLabel = formatDiagramType(detectedType)
+  const toggleCodeIcon = isCollapsed ? ICONS.expand : ICONS.collapse
+  const toggleCodeLabel = isCollapsed ? '展开代码' : '收起代码'
+  const toggleChartIcon = isChartHidden ? ICONS.eye : ICONS.eyeOff
+  const toggleChartLabel = isChartHidden ? '显示图表' : '隐藏图表'
 
   try {
     const result = peleRender(code, {
@@ -90,20 +104,40 @@ function renderPeleBlock(blockEl: HTMLElement) {
       responsive: true
     })
 
+    const badgeHtml = badgeLabel
+      ? `<span class="logseq-pele-badge" title="图表类型: ${badgeLabel}">${badgeLabel}</span>`
+      : ''
+
     previewEl.innerHTML = `
       <div class="logseq-pele-actions">
-        <button class="logseq-pele-toggle-btn" type="button" title="点击折叠或展开源码">
-          <span class="pele-btn-icon">‹/›</span>
-          <span class="pele-btn-label">${isCollapsed ? '展开代码' : '收起代码'}</span>
+        <button class="logseq-pele-btn logseq-pele-toggle-btn" type="button" title="点击折叠或展开源码">
+          <span class="pele-btn-icon">${toggleCodeIcon}</span>
+          <span class="pele-btn-label">${toggleCodeLabel}</span>
         </button>
-        <span class="logseq-pele-badge" title="Powered by Pele (Fast Mermaid)">${badgeLabel}</span>
+        <button class="logseq-pele-btn logseq-pele-toggle-chart-btn" type="button" title="${isChartHidden ? '点击显示渲染图表' : '点击隐藏渲染图表，只看代码'}">
+          <span class="pele-btn-icon">${toggleChartIcon}</span>
+          <span class="pele-btn-label">${toggleChartLabel}</span>
+        </button>
+        <button class="logseq-pele-btn logseq-pele-copy-btn" type="button" title="复制 SVG 矢量代码到剪贴板">
+          <span class="pele-btn-icon">${ICONS.copy}</span>
+          <span class="pele-btn-label">复制 SVG</span>
+        </button>
+        <button class="logseq-pele-btn logseq-pele-svg-btn" type="button" title="下载为 .svg 矢量文件">
+          <span class="pele-btn-icon">${ICONS.downloadSvg}</span>
+          <span class="pele-btn-label">SVG</span>
+        </button>
+        <button class="logseq-pele-btn logseq-pele-png-btn" type="button" title="下载为高清 .png 图片">
+          <span class="pele-btn-icon">${ICONS.downloadPng}</span>
+          <span class="pele-btn-label">PNG</span>
+        </button>
+        ${badgeHtml}
       </div>
       <div class="logseq-pele-container">
         ${result.svg}
       </div>
     `
 
-    // 绑定一键折叠按钮事件
+    // 1. 绑定折叠/展开源码按钮事件
     const toggleBtn = previewEl.querySelector('.logseq-pele-toggle-btn') as HTMLButtonElement | null
     if (toggleBtn) {
       toggleBtn.addEventListener('click', (e) => {
@@ -111,9 +145,69 @@ function renderPeleBlock(blockEl: HTMLElement) {
         e.preventDefault()
         const nowCollapsed = blockEl.classList.toggle(COLLAPSED_CLASS)
         const labelEl = toggleBtn.querySelector('.pele-btn-label')
+        const iconEl = toggleBtn.querySelector('.pele-btn-icon')
         if (labelEl) {
           labelEl.textContent = nowCollapsed ? '展开代码' : '收起代码'
         }
+        if (iconEl) {
+          iconEl.innerHTML = nowCollapsed ? ICONS.expand : ICONS.collapse
+        }
+      })
+    }
+
+    // 2. 绑定隐藏/显示图表按钮事件
+    const toggleChartBtn = previewEl.querySelector('.logseq-pele-toggle-chart-btn') as HTMLButtonElement | null
+    if (toggleChartBtn) {
+      toggleChartBtn.addEventListener('click', (e) => {
+        e.stopPropagation()
+        e.preventDefault()
+        const nowHidden = blockEl.classList.toggle(HIDE_CHART_CLASS)
+
+        // 若隐藏图表时源码处于折叠状态，则自动展开源码，避免用户什么都看不到
+        if (nowHidden && blockEl.classList.contains(COLLAPSED_CLASS)) {
+          blockEl.classList.remove(COLLAPSED_CLASS)
+          if (toggleBtn) {
+            const codeLabel = toggleBtn.querySelector('.pele-btn-label')
+            const codeIcon = toggleBtn.querySelector('.pele-btn-icon')
+            if (codeLabel) codeLabel.textContent = '收起代码'
+            if (codeIcon) codeIcon.innerHTML = ICONS.collapse
+          }
+        }
+
+        const labelEl = toggleChartBtn.querySelector('.pele-btn-label')
+        const iconEl = toggleChartBtn.querySelector('.pele-btn-icon')
+        if (labelEl) {
+          labelEl.textContent = nowHidden ? '显示图表' : '隐藏图表'
+        }
+        if (iconEl) {
+          iconEl.innerHTML = nowHidden ? ICONS.eye : ICONS.eyeOff
+        }
+        toggleChartBtn.title = nowHidden ? '点击显示渲染图表' : '点击隐藏渲染图表，只看代码'
+      })
+    }
+
+    // 2. 绑定复制与下载事件
+    const svgEl = previewEl.querySelector('svg')
+    if (svgEl) {
+      const copyBtn = previewEl.querySelector('.logseq-pele-copy-btn') as HTMLButtonElement | null
+      copyBtn?.addEventListener('click', (e) => {
+        e.stopPropagation()
+        e.preventDefault()
+        copySvgToClipboard(svgEl, copyBtn)
+      })
+
+      const svgBtn = previewEl.querySelector('.logseq-pele-svg-btn') as HTMLButtonElement | null
+      svgBtn?.addEventListener('click', (e) => {
+        e.stopPropagation()
+        e.preventDefault()
+        downloadSvgFile(svgEl, detectedType || 'diagram')
+      })
+
+      const pngBtn = previewEl.querySelector('.logseq-pele-png-btn') as HTMLButtonElement | null
+      pngBtn?.addEventListener('click', (e) => {
+        e.stopPropagation()
+        e.preventDefault()
+        downloadPngFile(svgEl, detectedType || 'diagram')
       })
     }
   } catch (err: any) {
@@ -164,13 +258,14 @@ export function initDomObserver() {
   // 1. 注入 CSS 至宿主顶层 document.head
   try {
     const styleId = 'logseq-pele-dynamic-style'
-    let styleTag = doc.getElementById(styleId)
+    let styleTag = doc.getElementById(styleId) as HTMLStyleElement | null
     if (!styleTag) {
       styleTag = doc.createElement('style')
       styleTag.id = styleId
-      styleTag.textContent = themeStyles
       doc.head.appendChild(styleTag)
     }
+    // 每次重新加载插件均强制刷新最新样式
+    styleTag.textContent = themeStyles
   } catch (e) {
     //
   }

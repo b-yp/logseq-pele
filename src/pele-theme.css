@@ -88,43 +88,46 @@ html[data-theme='dark'] .logseq-pele-container,
   height: auto;
 }
 
-/* 图表卡片内的浮动操作栏（平时低调，hover 时清晰显现，内嵌不遮挡） */
+/* 图表卡片内的浮动操作栏（平时完全隐藏，鼠标悬停时平滑显现） */
 .logseq-pele-actions {
   position: absolute;
   top: 6px;
   right: 6px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  opacity: 0.35;
-  transition: opacity 0.2s ease-in-out;
+  gap: 5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 5;
 }
 
-.logseq-pele-wrapper:hover .logseq-pele-actions {
+.logseq-pele-wrapper:hover .logseq-pele-actions,
+.logseq-pele-preview:hover .logseq-pele-actions {
   opacity: 1;
+  pointer-events: auto;
 }
 
-/* 优雅低调的徽标 */
+/* 优雅低调的类型徽标（去掉了冗余的前缀，更加极简） */
 .logseq-pele-badge {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 4px;
-  background-color: var(--ls-tertiary-background-color, rgba(255, 255, 255, 0.08));
+  background-color: var(--ls-tertiary-background-color, rgba(255, 255, 255, 0.06));
   color: var(--ls-secondary-text-color, #94a3b8);
-  border: 1px solid var(--ls-border-color, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--ls-border-color, rgba(255, 255, 255, 0.08));
   user-select: none;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
   white-space: nowrap;
 }
 
-/* 一键折叠/展开源码按钮 */
-.logseq-pele-toggle-btn {
+/* 通用操作按钮 */
+.logseq-pele-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
+  padding: 2px 7px;
   font-size: 11px;
   font-family: var(--pele-font, sans-serif);
   line-height: 1.4;
@@ -138,10 +141,29 @@ html[data-theme='dark'] .logseq-pele-container,
   white-space: nowrap;
 }
 
-.logseq-pele-toggle-btn:hover {
+.logseq-pele-btn:hover {
   color: var(--ls-primary-text-color, #ffffff);
-  background-color: var(--ls-quaternary-background-color, rgba(255, 255, 255, 0.18));
+  background-color: var(--ls-quaternary-background-color, rgba(255, 255, 255, 0.2));
   border-color: var(--ls-link-text-color, #3b82f6);
+}
+
+.logseq-pele-btn:active {
+  transform: scale(0.96);
+}
+
+.logseq-pele-btn .pele-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  opacity: 0.85;
+}
+
+.logseq-pele-btn .pele-btn-icon svg {
+  display: block;
+  width: 13px;
+  height: 13px;
 }
 
 /* 折叠源码时的样式规则：隐藏代码编辑器及上方多余元素，只留下纯净图表 */
@@ -156,6 +178,38 @@ html[data-theme='dark'] .logseq-pele-container,
 
 .extensions__code.pele-code-collapsed .logseq-pele-preview {
   margin-top: 0 !important;
+}
+
+/* 隐藏图表时的样式规则：隐藏 SVG 容器与不适用的操作按钮，操作栏以极简小药丸停驻在代码块右下方 */
+.extensions__code.pele-chart-hidden .logseq-pele-container {
+  display: none !important;
+}
+
+.extensions__code.pele-chart-hidden .logseq-pele-preview {
+  margin-top: 4px !important;
+}
+
+.extensions__code.pele-chart-hidden .logseq-pele-actions {
+  position: static !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  justify-content: flex-end;
+  margin-top: 2px;
+  padding: 2px 0;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.extensions__code.pele-chart-hidden:hover .logseq-pele-actions,
+.extensions__code.pele-chart-hidden .logseq-pele-actions:hover {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.extensions__code.pele-chart-hidden .logseq-pele-toggle-btn,
+.extensions__code.pele-chart-hidden .logseq-pele-copy-btn,
+.extensions__code.pele-chart-hidden .logseq-pele-svg-btn,
+.extensions__code.pele-chart-hidden .logseq-pele-png-btn {
+  display: none !important;
 }
 
 .logseq-pele-error {
