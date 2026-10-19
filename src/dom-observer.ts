@@ -1,8 +1,9 @@
-import { render as peleRender, supports as peleSupports, enableZoom } from 'pele'
+import { render as peleRender, supports as peleSupports, detectType as peleDetectType } from 'pele'
 import themeStyles from './pele-theme.css?inline'
 
 const CODE_ATTR = 'data-pele-code'
 const PREVIEW_CLASS = 'logseq-pele-preview'
+const COLLAPSED_CLASS = 'pele-code-collapsed'
 
 function getTopContext(): { doc: Document; win: Window } {
   try {
@@ -46,6 +47,11 @@ function isMermaidOrPele(blockEl: HTMLElement, code: string): boolean {
   }
 }
 
+function formatDiagramType(type: string | null): string {
+  if (!type) return 'Pele'
+  return `Pele · ${type.charAt(0).toUpperCase() + type.slice(1)}`
+}
+
 function renderPeleBlock(blockEl: HTMLElement) {
   const cmEl = blockEl.querySelector('.CodeMirror') as HTMLElement | null
   if (!cmEl) return
@@ -72,6 +78,12 @@ function renderPeleBlock(blockEl: HTMLElement) {
     blockEl.appendChild(previewEl)
   }
 
+  blockEl.setAttribute('data-pele-rendered', 'true')
+
+  const isCollapsed = blockEl.classList.contains(COLLAPSED_CLASS)
+  const detectedType = peleDetectType(code)
+  const badgeLabel = formatDiagramType(detectedType)
+
   try {
     const result = peleRender(code, {
       fontSize: 14,
@@ -80,20 +92,29 @@ function renderPeleBlock(blockEl: HTMLElement) {
 
     previewEl.innerHTML = `
       <div class="logseq-pele-actions">
-        <span class="logseq-pele-badge" title="Powered by Pele (Fast Mermaid)">Pele</span>
+        <button class="logseq-pele-toggle-btn" type="button" title="点击折叠或展开源码">
+          <span class="pele-btn-icon">‹/›</span>
+          <span class="pele-btn-label">${isCollapsed ? '展开代码' : '收起代码'}</span>
+        </button>
+        <span class="logseq-pele-badge" title="Powered by Pele (Fast Mermaid)">${badgeLabel}</span>
       </div>
-      <div class="logseq-pele-container is-zoomable">
+      <div class="logseq-pele-container">
         ${result.svg}
       </div>
     `
 
-    const containerEl = previewEl.querySelector('.logseq-pele-container') as HTMLElement
-    if (containerEl) {
-      try {
-        enableZoom(containerEl)
-      } catch (zErr) {
-        // ignore
-      }
+    // 绑定一键折叠按钮事件
+    const toggleBtn = previewEl.querySelector('.logseq-pele-toggle-btn') as HTMLButtonElement | null
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation()
+        e.preventDefault()
+        const nowCollapsed = blockEl.classList.toggle(COLLAPSED_CLASS)
+        const labelEl = toggleBtn.querySelector('.pele-btn-label')
+        if (labelEl) {
+          labelEl.textContent = nowCollapsed ? '展开代码' : '收起代码'
+        }
+      })
     }
   } catch (err: any) {
     const msg = err?.message || String(err)

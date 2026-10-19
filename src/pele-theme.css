@@ -1,12 +1,33 @@
 /* Logseq Pele Theme Adapter */
 
+/* 强制上下流式排版，避免挤在右半边 */
+.extensions__code:has(.logseq-pele-preview),
+.extensions__code[data-pele-rendered="true"] {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+}
+
+.extensions__code:has(.logseq-pele-preview) .code-editor,
+.extensions__code[data-pele-rendered="true"] .code-editor {
+  width: 100% !important;
+  flex: 1 1 100% !important;
+}
+
+/* 预览卡片外层包裹 */
+.logseq-pele-preview {
+  width: 100% !important;
+  margin-top: 8px;
+  box-sizing: border-box;
+}
+
 .logseq-pele-wrapper {
   position: relative;
   width: 100%;
-  margin: 0.5rem 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
 }
 
 .logseq-pele-container {
@@ -15,13 +36,14 @@
   width: 100%;
   min-height: 80px;
   max-width: 100%;
-  overflow: auto;
-  padding: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 24px 16px 16px 16px;
   border-radius: 8px;
   box-sizing: border-box;
   background-color: var(--pele-bg, var(--ls-secondary-background-color, transparent));
   border: 1px solid var(--ls-border-color, rgba(128, 128, 128, 0.2));
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 
   /* 将 Logseq CSS 变量桥接到 Pele 原生规范 */
   --pele-font: var(--ls-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
@@ -56,7 +78,7 @@ html[data-theme='dark'] .logseq-pele-container,
 }
 
 .logseq-pele-container:hover {
-  border-color: var(--ls-link-text-color, #3b82f6);
+  border-color: var(--ls-link-text-color, rgba(59, 130, 246, 0.4));
 }
 
 .logseq-pele-container svg {
@@ -66,41 +88,74 @@ html[data-theme='dark'] .logseq-pele-container,
   height: auto;
 }
 
-/* 支持缩放漫游时的 SVG 样式 */
-.logseq-pele-container.is-zoomable {
-  cursor: grab;
-}
-
-.logseq-pele-container.is-zoomable:active {
-  cursor: grabbing;
-}
-
-/* 工具栏小浮标 */
+/* 图表卡片内的浮动操作栏（平时低调，hover 时清晰显现，内嵌不遮挡） */
 .logseq-pele-actions {
   position: absolute;
   top: 6px;
   right: 6px;
   display: flex;
-  gap: 4px;
-  opacity: 0;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.35;
   transition: opacity 0.2s ease-in-out;
-  z-index: 10;
+  z-index: 5;
 }
 
 .logseq-pele-wrapper:hover .logseq-pele-actions {
   opacity: 1;
 }
 
+/* 优雅低调的徽标 */
 .logseq-pele-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
   border-radius: 4px;
-  background-color: var(--pele-accent, #3b82f6);
-  color: #ffffff;
+  background-color: var(--ls-tertiary-background-color, rgba(255, 255, 255, 0.08));
+  color: var(--ls-secondary-text-color, #94a3b8);
+  border: 1px solid var(--ls-border-color, rgba(255, 255, 255, 0.1));
   user-select: none;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+/* 一键折叠/展开源码按钮 */
+.logseq-pele-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-family: var(--pele-font, sans-serif);
+  line-height: 1.4;
+  color: var(--ls-secondary-text-color, #94a3b8);
+  background-color: var(--ls-tertiary-background-color, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--ls-border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.logseq-pele-toggle-btn:hover {
+  color: var(--ls-primary-text-color, #ffffff);
+  background-color: var(--ls-quaternary-background-color, rgba(255, 255, 255, 0.18));
+  border-color: var(--ls-link-text-color, #3b82f6);
+}
+
+/* 折叠源码时的样式规则：隐藏代码编辑器及上方多余元素，只留下纯净图表 */
+.extensions__code.pele-code-collapsed .code-editor,
+.extensions__code.pele-code-collapsed > div:not(.logseq-pele-preview) {
+  display: none !important;
+}
+
+.extensions__code.pele-code-collapsed {
+  width: 100% !important;
+}
+
+.extensions__code.pele-code-collapsed .logseq-pele-preview {
+  margin-top: 0 !important;
 }
 
 .logseq-pele-error {
