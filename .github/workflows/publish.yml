@@ -34,7 +34,7 @@ jobs:
         run: pnpm run build
 
       - name: Create release zip
-        run: zip -r logseq-pele.zip dist/ package.json icon.png README.md LICENSE
+        run: zip -r logseq-pele.zip dist/ package.json icon.svg README.md LICENSE
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2

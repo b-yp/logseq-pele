@@ -2,6 +2,8 @@
 
 > 🚀 **Ultra-fast, theme-adaptive, zero-dependency** Mermaid diagram renderer for Logseq, powered by Steph Ango's ([@kepano](https://github.com/obsidianmd/pele)) next-generation [Pele](https://github.com/obsidianmd/pele) engine.
 
+![logseq-pele preview](./demo.png)
+
 ---
 
 ## ✨ Features
